@@ -8,5 +8,20 @@
       "babel-runtime": "npm:babel-runtime@^5.1.13",
       "core-js": "npm:core-js@^0.9.4"
     }
-  }
+  },
+  "name": "es6-jspm-angular",
+  "version": "1.0.0",
+  "main": "server/app.js",
+  "dependencies": {
+    "connect-livereload": "^0.5.3",
+    "express": "^4.13.0",
+    "morgan": "^1.6.0",
+    "body-parser": "^1.13.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
