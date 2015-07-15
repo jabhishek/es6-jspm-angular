@@ -2,3 +2,4 @@
 client/jspm_packages
 .idea
 node_modules
+build

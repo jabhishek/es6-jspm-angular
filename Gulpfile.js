@@ -4,10 +4,12 @@ var runSequence = require('run-sequence');
 var $gulp = require('gulp-load-plugins')({
 	lazy: false
 });
+var inject = require('gulp-inject');
+var exec = require('child_process').exec;
+var argv = require('yargs').argv;
 
 gulp.task('watch', function () {
 	"use strict";
-	/*gulp.watch(['server/!**!/!*.js'], ['test:server']);*/
 	gulp.watch(['server/**/*.js'], ['server:restart']);
 
 	gulp.watch([
@@ -17,17 +19,45 @@ gulp.task('watch', function () {
 
 gulp.task('server:start', function () {
 	"use strict";
-	server.listen({path: 'server/app.js', execArgv: ['--harmony', '--use_strict']}, $gulp.livereload.listen);
+	var mode = argv.production ? 'production' : 'development';
+	server.listen({
+			path: 'server/app.js',
+			execArgv: ['--harmony', '--use_strict'],
+			env: { PORT: 5000, NODE_ENV: mode }
+		},
+		$gulp.livereload.listen);
 });
 
 gulp.task('server:restart', function () {
-	//server.restart();
 	server.changed(function (error) {
 		if (!error) $gulp.livereload.changed();
 	});
 });
 
+/* Run "gulp --production" if want to run in production mode (files served from build folder) */
 gulp.task('default', function () {
 	runSequence('server:start', 'watch');
 });
 
+/* Distribution tasks */
+
+gulp.task('build:js', function (cb) {
+	exec('jspm bundle-sfx app/bootstrap build/app.js --minify --no-mangle', function (err, stdout, stderr) {
+		console.log(stdout);
+		console.log(stderr);
+		cb(err);
+	});
+});
+
+gulp.task('html', ['build:js'], function () {
+	var target = gulp.src('./client/index.html');
+	var sources = gulp.src(['./build/app.js'], {read: false});
+
+	return target
+		.pipe(inject(sources, {addRootSlash: false, ignorePath: 'build'}))
+		.pipe(gulp.dest('./build/'));
+});
+
+gulp.task('dist', function () {
+	runSequence('html');
+});

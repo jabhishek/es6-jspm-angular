@@ -5,6 +5,7 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var port = process.env.PORT || 9000;
 
+
 // test let support
 var rootPath = path.normalize(__dirname + '/..');
 var appPath;
@@ -20,7 +21,7 @@ if (app.get("env") === "development") {
 	appPath = path.join(rootPath, 'client');
 }
 if (app.get("env") === "production") {
-	appPath = path.join(rootPath, 'client');
+	appPath = path.join(rootPath, 'build');
 }
 
 
