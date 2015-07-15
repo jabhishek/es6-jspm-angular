@@ -16,12 +16,22 @@ app.use(bodyParser.json());
 
 if (app.get("env") === "development") {
 	app.use(morgan('dev'));
-	//app.use(require('connect-livereload')());
+	app.use(require('connect-livereload')());
+	appPath = path.join(rootPath, 'client');
+}
+if (app.get("env") === "production") {
 	appPath = path.join(rootPath, 'client');
 }
 
+
 app.use(express.static(appPath));
 app.set("appPath", appPath);
+
+app.route('/*')
+	.get(function(req, res) {
+		res.sendFile(app.get('appPath') + '/index.html');
+	});
+
 
 app.listen(port, function () {
 	console.log('Listening on port ' + port + " in mode: " + app.get("env"));

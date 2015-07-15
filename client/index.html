@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html ng-app>
+<html data-app>
 <head lang="en">
     <meta charset="UTF-8">
     <title>Web Playground</title>
 </head>
 <body>
-<div>{{ 'Hello' + ' World'}}</div>
+<!-- jspm bundle app/bootstrap client/build/bundle.js --inject --minify --no-mangle to create a bundle and inject in config.js -->
+<ui-view></ui-view>
+
 <script src="jspm_packages/system.js"></script>
 <script src="config.js"></script>
 <script>
-    System.import("js/app");
+    System.import("app/bootstrap");
 </script>
 </body>
 </html>
