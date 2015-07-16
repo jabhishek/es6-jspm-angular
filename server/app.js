@@ -5,6 +5,7 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var port = process.env.PORT || 9000;
 
+var uri = require('./config/environment').mongo.uri;
 
 // test let support
 var rootPath = path.normalize(__dirname + '/..');
@@ -14,6 +15,14 @@ var app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+var mongoose = require('mongoose');
+mongoose.connect(uri);
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function (callback) {
+	console.log('connected');
+});
 
 if (app.get("env") === "development") {
 	app.use(morgan('dev'));
@@ -28,11 +37,7 @@ if (app.get("env") === "production") {
 app.use(express.static(appPath));
 app.set("appPath", appPath);
 
-app.route('/*')
-	.get(function(req, res) {
-		res.sendFile(app.get('appPath') + '/index.html');
-	});
-
+require("./routes")(app);
 
 app.listen(port, function () {
 	console.log('Listening on port ' + port + " in mode: " + app.get("env"));

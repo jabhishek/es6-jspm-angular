@@ -26,15 +26,14 @@ gulp.task('karma', function(cb) {
 	var server = new Server(config, null);
 	server.start();
 	cb();
-	/*return gulp.src(scripts)
-		.pipe($gulp.karma({
-			configFile: 'karma.conf.js',
-			action: 'watch'
-		}))
-		.on('error', function(err) {
-			// Make sure failed tests cause gulp to exit non-zero
-			throw err;
-		});*/
+});
+
+/* Run gulp test:server --harmony */
+gulp.task('test:server', function () {
+	"use strict";
+	return gulp.src('server/**/*.spec.js')
+		.pipe($gulp.mocha({reporter: 'spec'}))
+		.on('error', $gulp.util.log);
 });
 
 
