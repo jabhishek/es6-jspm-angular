@@ -9,6 +9,34 @@ var exec = require('child_process').exec;
 var argv = require('yargs').argv;
 var builder = require('jspm');
 var del = require('del');
+var path = require('path');
+
+var scripts = ['client/app/*.js'];
+
+
+gulp.task('karma', function(cb) {
+
+	var Server = require('karma').Server;
+	var config = {
+		configFile: path.join(__dirname, '/karma.conf.js'),
+		singleRun: false,
+		autoWatch: true
+	};
+
+	var server = new Server(config, null);
+	server.start();
+	cb();
+	/*return gulp.src(scripts)
+		.pipe($gulp.karma({
+			configFile: 'karma.conf.js',
+			action: 'watch'
+		}))
+		.on('error', function(err) {
+			// Make sure failed tests cause gulp to exit non-zero
+			throw err;
+		});*/
+});
+
 
 gulp.task('watch', function () {
 	"use strict";

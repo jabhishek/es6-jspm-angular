@@ -2,7 +2,7 @@ import angular from 'angular';
 
 class MainController {
 	constructor() {
-		this.user = {name: "Abhi"};
+		this.user = {name: "World"};
 	}
 }
 
