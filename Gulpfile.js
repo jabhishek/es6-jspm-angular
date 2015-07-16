@@ -7,14 +7,17 @@ var $gulp = require('gulp-load-plugins')({
 var inject = require('gulp-inject');
 var exec = require('child_process').exec;
 var argv = require('yargs').argv;
+var builder = require('jspm');
+var del = require('del');
 
 gulp.task('watch', function () {
 	"use strict";
-	gulp.watch(['server/**/*.js'], ['server:restart']);
-
-	gulp.watch([
-		'client/index.html', 'client/app/**/*.js', 'client/app/**/*.html'
-	], $gulp.livereload.changed);
+	if (!argv.production) {
+		gulp.watch(['server/**/*.js'], ['server:restart']);
+		gulp.watch([
+			'client/index.html', 'client/app/**/*.js', 'client/app/**/*.html'
+		], $gulp.livereload.changed);
+	}
 });
 
 gulp.task('server:start', function () {
@@ -39,25 +42,34 @@ gulp.task('default', function () {
 	runSequence('server:start', 'watch');
 });
 
+
+
+
 /* Distribution tasks */
+gulp.task('clean', function(cb) {
+	del([
+		'build', 'temp'
+	], cb);
+});
 
 gulp.task('build:js', function (cb) {
-	exec('jspm bundle-sfx app/bootstrap build/app.js --minify --no-mangle', function (err, stdout, stderr) {
-		console.log(stdout);
-		console.log(stderr);
-		cb(err);
+	builder.bundleSFX('app/bootstrap', 'temp/app.js', { minify: true, mangle: true }).then(function(output) {
+		cb();
 	});
 });
 
-gulp.task('html', ['build:js'], function () {
-	var target = gulp.src('./client/index.html');
-	var sources = gulp.src(['./build/app.js'], {read: false});
+gulp.task('cache-bust', function() {
+	return gulp.src('temp/app.js')
+		.pipe($gulp.rev())
+		.pipe(gulp.dest('build'));
+});
 
-	return target
-		.pipe(inject(sources, {addRootSlash: false, ignorePath: 'build'}))
-		.pipe(gulp.dest('./build/'));
+gulp.task('html', function () {
+	return gulp.src('client/index.html')
+		.pipe(inject(gulp.src(['build/app*.js'], {read: false}), {addRootSlash: false, ignorePath: 'build'}))
+		.pipe(gulp.dest('build/'));
 });
 
 gulp.task('dist', function () {
-	runSequence('html');
+	runSequence('clean', 'build:js', 'cache-bust', 'html');
 });
