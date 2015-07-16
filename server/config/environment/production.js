@@ -1,16 +1,15 @@
 'use strict';
-// Edit this file and rename as production.js
 var localEnv = require('../local.env');
 
 // Production specific configuration
 // =================================
 module.exports = {
-	// MongoDB connection options - ideally coming from environment config
+	// MongoDB connection options
 	mongo: {
-		uri: 'prod_url'
+		uri: process.env.MONGOLAB_URI
 	},
 
 	secrets: {
-		session: 'SESSION_SECRET'
+		session: process.env.SESSION_SECRET
 	}
 };
